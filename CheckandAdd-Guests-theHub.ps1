@@ -1,8 +1,20 @@
+$ver = '2.0'
 <#
 Created By: Kristopher Roy
 Last Updated By: BTL
-Last Updated On: 29Nov2021
+Created On: 29Nov2021
+Last Updated On: 22Feb2022
 #>
+
+#Begin Script
+
+#Verify most recent version being used
+$curver = $ver
+$data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/BellTechlogix/CheckandAdd-Guests-theHub/master/CheckandAdd-Guests-theHub.ps1
+Invoke-Expression ($data.substring(0,13))
+if($curver -ge $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
+ELSEIF($curver -lt $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
+EXIT}
 
 $cred = Get-Credential
 
