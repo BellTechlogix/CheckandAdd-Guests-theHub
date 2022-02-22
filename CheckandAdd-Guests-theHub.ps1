@@ -7,19 +7,6 @@ Last Updated On: 22Feb2022
 #>
 
 #Begin Script
-
-#Verify most recent version being used
-$curver = $ver
-$data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/BellTechlogix/CheckandAdd-Guests-theHub/master/CheckandAdd-Guests-theHub.ps1
-Invoke-Expression ($data.substring(0,13))
-if($curver -ge $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
-ELSEIF($curver -lt $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
-EXIT}
-
-$cred = Get-Credential
-
-Connect-AzureAD -Credential $cred
-
 #$users = import-csv C:\projects\gtil\TheHub-Import.csv
 Function InputBox($header,$text,$icon)
 {
@@ -71,6 +58,18 @@ Function InputBox($header,$text,$icon)
     Return $textBox.Text
     }
 }
+
+#Verify most recent version being used
+$curver = $ver
+$data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/BellTechlogix/CheckandAdd-Guests-theHub/master/CheckandAdd-Guests-theHub.ps1
+Invoke-Expression ($data.substring(0,13))
+if($curver -ge $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
+ELSEIF($curver -lt $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
+EXIT}
+
+$cred = Get-Credential
+
+Connect-AzureAD -Credential $cred
 
 #Grab Users from InputBox
 $users = (InputBox -header "Email List" -text "Please List Emails from ticket to be added" -icon "C:\Windows\SystemApps\Microsoft.Windows.SecHealthUI_cw5n1h2txyewy\Assets\Account.theme-light.ico").split('')
