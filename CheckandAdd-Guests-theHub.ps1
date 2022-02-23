@@ -1,9 +1,9 @@
-$ver = '2.01'
+$ver = '2.02'
 <#
 Created By: Kristopher Roy
 Last Updated By: BTL
 Created On: 29Nov2021
-Last Updated On: 22Feb2022
+Last Updated On: 23Feb2022
 #>
 
 #Begin Script
@@ -65,6 +65,7 @@ $data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/Bel
 Invoke-Expression ($data.substring(0,13))
 if($curver -ge $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
 ELSEIF($curver -lt $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
+start-sleep -seconds 10
 EXIT}
 
 #Verify Azure Module loaded
@@ -73,7 +74,8 @@ IF(Get-Module -ListAvailable|where{$_.name -like "AzureAD*"}){$AAD = $True}Else{
     start-sleep -seconds 5
 	IF(Get-Module -ListAvailable|where{$_.name -like "AzureAD*"}){$AAD = $True}ELSE{
 		powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('AzureAD Module is missing and will not auto-install please resolve then re-run')}"
-		 Exit
+		start-sleep -seconds 10 
+		Exit
 			}
 }
 
