@@ -1,4 +1,4 @@
-$ver = '2.0'
+$ver = '2.01'
 <#
 Created By: Kristopher Roy
 Last Updated By: BTL
@@ -66,6 +66,16 @@ Invoke-Expression ($data.substring(0,13))
 if($curver -ge $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
 ELSEIF($curver -lt $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
 EXIT}
+
+#Verify Azure Module loaded
+IF(Get-Module -ListAvailable|where{$_.name -like "AzureAD*"}){$AAD = $True}Else{
+    Install-Module -Name AzureAD
+    start-sleep -seconds 5
+	IF(Get-Module -ListAvailable|where{$_.name -like "AzureAD*"}){$AAD = $True}ELSE{
+		powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('AzureAD Module is missing and will not auto-install please resolve then re-run')}"
+		 Exit
+			}
+}
 
 $cred = Get-Credential
 
