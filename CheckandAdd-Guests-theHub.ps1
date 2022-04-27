@@ -1,4 +1,4 @@
-$ver = '2.03'
+$ver = '2.04'
 <#
 Created By: Kristopher Roy
 Last Updated By: BTL
@@ -90,6 +90,7 @@ $users = (InputBox -header "Email List" -text "Please List Emails from ticket to
 FOREACH($User in ($users.split('')))
 {
     $aaduser = Get-AzureADUser -filter "DisplayName eq '$user'"|select *
+    IF($aaduser -eq $null){$aaduser = Get-AzureADUser -filter "Mail eq '$user'"|select *}
     IF($aaduser -eq $null){$aaduser = Get-AzureADUser -filter "UserPrincipalName eq '$user'"|select *}
     If($aaduser -eq $null)
     {
@@ -99,6 +100,7 @@ FOREACH($User in ($users.split('')))
         New-AzureADMSInvitation -InvitedUserDisplayName $DisplayName -InvitedUserEmailAddress $user -InviteRedirectURL https://gtinetorg.sharepoint.com/sites/theHUB -SendInvitationMessage $true
         start-sleep 10
         $aaduser = Get-AzureADUser -filter "DisplayName eq '$user'"
+        IF($aaduser -eq $null){$aaduser = Get-AzureADUser -filter "Mail eq '$user'"}
 		powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('"($aaduser.userprincipalname)" exists adding to groups')}"
         Add-AzureADGroupMember -ObjectId 1bc2445f-5478-4d22-aac1-29c000817f7b -RefObjectID $aaduser.ObjectId
     }
@@ -114,6 +116,3 @@ FOREACH($User in ($users.split('')))
 }
 
 #$USERS|export-csv C:\projects\gtil\TheHub-Import-11Feb22-GrabbedandAddedUsers.csv -NoTypeInformation
-
-
-
