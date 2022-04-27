@@ -1,9 +1,9 @@
-$ver = '2.02'
+$ver = '2.03'
 <#
 Created By: Kristopher Roy
 Last Updated By: BTL
 Created On: 29Nov2021
-Last Updated On: 23Feb2022
+Last Updated On: 27APR2022
 #>
 
 #Begin Script
@@ -63,8 +63,8 @@ Function InputBox($header,$text,$icon)
 $curver = $ver
 $data = Invoke-RestMethod -Method Get -Uri https://raw.githubusercontent.com/BellTechlogix/CheckandAdd-Guests-theHub/master/CheckandAdd-Guests-theHub.ps1
 Invoke-Expression ($data.substring(0,13))
-if($curver -ge $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
-ELSEIF($curver -lt $ver){powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
+if($curver -ge $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running the most current script version $ver')}"}
+ELSEIF($curver -lt $ver){powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('You are running $curver the most current script version is $ver. Ending')}" 
 start-sleep -seconds 10
 EXIT}
 
@@ -73,7 +73,7 @@ IF(Get-Module -ListAvailable|where{$_.name -like "AzureAD*"}){$AAD = $True}Else{
     Install-Module -Name AzureAD
     start-sleep -seconds 5
 	IF(Get-Module -ListAvailable|where{$_.name -like "AzureAD*"}){$AAD = $True}ELSE{
-		powershell -WindowStyle hidden -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('AzureAD Module is missing and will not auto-install please resolve then re-run')}"
+		powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('AzureAD Module is missing and will not auto-install please resolve then re-run')}"
 		start-sleep -seconds 10 
 		Exit
 			}
@@ -89,21 +89,23 @@ $users = (InputBox -header "Email List" -text "Please List Emails from ticket to
 #Loop through and check users then add them as Guest accounts if missing, and then add them to theHub Guest users group
 FOREACH($User in ($users.split('')))
 {
-    $aaduser = Get-AzureADUser -filter "Mail eq '$user'"|select *
+    $aaduser = Get-AzureADUser -filter "DisplayName eq '$user'"|select *
     IF($aaduser -eq $null){$aaduser = Get-AzureADUser -filter "UserPrincipalName eq '$user'"|select *}
     If($aaduser -eq $null)
     {
         write-host "No User Account $user"
-        $user.DisplayName = (($user.split("@")[0].split(".")[0]).substring(0,1).toupper()+($user.split("@")[0].split(".")[0]).substring(1).toLower())+" "+(($user.split("@")[0].split(".")[1]).substring(0,1).toupper()+($user.split("@")[0].split(".")[1]).substring(1).toLower())
-        write-host "Creating Guest account for "($user.Displayname)
-        New-AzureADMSInvitation -InvitedUserDisplayName $User.DisplayName -InvitedUserEmailAddress $user -InviteRedirectURL https://gtinetorg.sharepoint.com/sites/theHUB -SendInvitationMessage $true
+        $DisplayName = (($user.split("@")[0].split(".")[0]).substring(0,1).toupper()+($user.split("@")[0].split(".")[0]).substring(1).toLower())+" "+(($user.split("@")[0].split(".")[1]).substring(0,1).toupper()+($user.split("@")[0].split(".")[1]).substring(1).toLower())
+        powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Creating Guest account for $Displayname')}"
+        New-AzureADMSInvitation -InvitedUserDisplayName $DisplayName -InvitedUserEmailAddress $user -InviteRedirectURL https://gtinetorg.sharepoint.com/sites/theHUB -SendInvitationMessage $true
         start-sleep 10
-        $aaduser = Get-AzureADUser -filter "Mail eq '$user'"
+        $aaduser = Get-AzureADUser -filter "DisplayName eq '$user'"
+		powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('"($aaduser.userprincipalname)" exists adding to groups')}"
         Add-AzureADGroupMember -ObjectId 1bc2445f-5478-4d22-aac1-29c000817f7b -RefObjectID $aaduser.ObjectId
     }
     ELSE
     {
-        Add-AzureADGroupMember -ObjectId 1bc2445f-5478-4d22-aac1-29c000817f7b -RefObjectID $aaduser.ObjectId
+        powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('"($aaduser.userprincipalname)" exists adding to groups')}"
+		Add-AzureADGroupMember -ObjectId 1bc2445f-5478-4d22-aac1-29c000817f7b -RefObjectID $aaduser.ObjectId
     }
     #$User.UserType = $aaduser.UserType
     #$User.UPN = $aaduser.UserPrincipalName
