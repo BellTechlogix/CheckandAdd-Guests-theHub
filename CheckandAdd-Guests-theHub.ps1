@@ -1,4 +1,4 @@
-$ver = '2.05'
+$ver = '2.06'
 <#
 Created By: Kristopher Roy
 Last Updated By: BTL
@@ -99,7 +99,8 @@ FOREACH($User in ($users.split('')|where{$_}))
     {
         write-host "No User Account $user"
         $DisplayName = (($user.split("@")[0].split(".")[0]).substring(0,1).toupper()+($user.split("@")[0].split(".")[0]).substring(1).toLower())+" "+(($user.split("@")[0].split(".")[1]).substring(0,1).toupper()+($user.split("@")[0].split(".")[1]).substring(1).toLower())
-        powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Creating Guest account for $Displayname')}"
+        IF($DisplayName -eq $null){$DisplayName = $user.split('@')[0]}
+		powershell -Command "& {[System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms'); [System.Windows.Forms.MessageBox]::Show('Creating Guest account for $Displayname')}"
         New-AzureADMSInvitation -InvitedUserDisplayName $DisplayName -InvitedUserEmailAddress $user -InviteRedirectURL https://gtinetorg.sharepoint.com/sites/theHUB -SendInvitationMessage $true
         start-sleep 15
         $aaduser = Get-AzureADUser -filter "DisplayName eq '$user'"
